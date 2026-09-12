@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/harvey-withington/usb-device-kb/schema/devices.schema.json",
+  "title": "usb-device-kb devices",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["devices"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "devices": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[0-9a-f]{4}:[0-9a-f]{4}$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "kind", "max_link"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "enum": ["storage", "video", "audio", "hid", "network", "hub", "display", "wireless", "printer", "serial", "imaging", "composite", "vendor", "unknown", "billboard", "smartcard"] },
+          "max_link": { "type": "string", "enum": ["unknown", "none", "low", "full", "high", "ss5", "ss10", "ss20", "usb4_20", "usb4_40", "usb4_80"] },
+          "claimed_read_mbps": { "type": "integer", "minimum": 0 },
+          "claimed_write_mbps": { "type": "integer", "minimum": 0 },
+          "usb4_id": { "type": "string", "pattern": "^[0-9a-f]{4}:[0-9a-f]{4}$", "description": "The USB4 router vid:pid the product presents when tunnelling PCIe" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

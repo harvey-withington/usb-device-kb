@@ -1,0 +1,82 @@
+{
+  "$comment": "Known docks and hubs. IDs are lower-case hex vid:pid. 'hubs' lists every logical hub the dock exposes so its internal chain counts as one hop and draws as one box. 'usb4' is the vendor and model strings the dock's own USB4 router announces from its DROM (Windows also puts them in the router's name, 'USB4 Router (1.0), <vendor> - <model>'); the router's own vid:pid is the bridge silicon shared by many docks, so it cannot identify one. 'verified' says how an entry was confirmed: 'hardware' means checked on a real dock, anything else names the source. 'port_map' pins logical hub ports to printed labels; only entries verified on real hardware belong there. Users add their own docks in the local layer (see core/kb); community-contributable.",
+  "generic_internal_hubs": {
+    "8087:0b40": "Intel Goshen Ridge USB hub, present inside most Thunderbolt 4 docks"
+  },
+  "docks": [
+    {
+      "id": "caldigit-ts4",
+      "name": "CalDigit TS4",
+      "hubs": ["2188:5802", "2188:5500", "2188:5510", "2188:5501", "2188:5511", "2188:5512", "2188:5502"],
+      "uplink": { "kind": "thunderbolt4", "max_link": "usb4_40" },
+      "usb4": { "vendor": "CalDigit, Inc.", "model": "TS4", "notes": "Router 8087:0b26 (Intel Goshen Ridge); DROM strings read on DEVIANT 2026-09-12, Windows names it 'USB4 Router (1.0), CalDigit. Inc. - TS4'." },
+      "verified": "hardware",
+      "ports": [
+        {
+          "label": "Thunderbolt 4",
+          "position": "rear",
+          "connector": "usb-c",
+          "max_link": "usb4_40",
+          "count": 2,
+          "notes": "Lightning-bolt icon. USB4 devices tunnel PCIe here and leave the USB tree; a USB4 SSD shows up as an NVMe disk."
+        },
+        {
+          "label": "USB-C Data",
+          "position": "front",
+          "connector": "usb-c",
+          "max_link": "ss10",
+          "count": 1,
+          "notes": "Same connector shape as the Thunderbolt ports but 10 Gbps. Label confirmed on hardware 2026-09-07."
+        },
+        {
+          "label": "USB-C",
+          "position": "rear",
+          "connector": "usb-c",
+          "max_link": "ss10",
+          "count": 2,
+          "notes": "Count unverified."
+        },
+        {
+          "label": "USB-A",
+          "position": "front",
+          "connector": "usb-a",
+          "max_link": "ss10",
+          "count": 1,
+          "notes": "Unverified."
+        },
+        {
+          "label": "USB-A",
+          "position": "rear",
+          "connector": "usb-a",
+          "max_link": "ss10",
+          "count": 4,
+          "notes": "Count unverified."
+        }
+      ],
+      "port_map": [
+        { "hub": "2188:5501", "port": 3, "label": "USB-C Data", "position": "front", "verified": "2026-09-07 on DEVIANT" }
+      ]
+    },
+    {
+      "id": "dell-wd19-wd22",
+      "name": "Dell WD19 / WD22 dock",
+      "hubs": ["413c:b06e", "413c:b06f"],
+      "verified": "fwupd plugins/dell-dock/dell-dock.quirk (LGPL-2.1+), read 2026-09-12",
+      "notes": "Realtek RTS5487 (413c:b06e) and RTS5413 (413c:b06f) hubs, shared by the WD19, WD19TB, WD19DC, WD19S and WD22TB4. The Thunderbolt variants also carry the Intel Goshen Ridge hub. Ports and the router strings are not recorded yet."
+    },
+    {
+      "id": "lenovo-thinkpad-usb4-dock",
+      "name": "Lenovo ThinkPad USB4 Dock",
+      "hubs": ["17ef:111e", "17ef:1119", "17ef:111a", "17ef:111b", "17ef:111c", "17ef:111d", "17ef:111f", "17ef:1193", "17ef:118e", "17ef:118f", "17ef:1190", "17ef:1191", "17ef:1192"],
+      "verified": "fwupd plugins/lenovo-dock/lenovo-dock.quirk (LGPL-2.1+), read 2026-09-12",
+      "notes": "Every USB id the dock's firmware updater claims (IoT and non-IoT variants); which of them are hubs is unverified, and only hubs are ever matched. Ports and the router strings are not recorded yet."
+    },
+    {
+      "id": "hp-thunderbolt-dock-g4",
+      "name": "HP Thunderbolt Dock G4",
+      "hubs": ["03f0:0488", "03f0:2488", "03f0:3488", "1d5c:5801"],
+      "verified": "lsusb listing in a published teardown (watchmysys.com, 2023-09), read 2026-09-12",
+      "notes": "Microchip USB4206 (03f0:2488) and USB7206 (03f0:3488) hubs, a Fresco Logic FL5801 USB 2 hub (1d5c:5801) and the dock's own device (03f0:0488). Ports and the router strings are not recorded yet."
+    }
+  ]
+}

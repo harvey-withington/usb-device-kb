@@ -1,0 +1,20 @@
+{
+  "$comment": "Known device capabilities that the device itself does not report over USB. Keys are lower-case hex vid:pid. usb4_id is the optional USB4 router vid:pid the same product presents when it tunnels PCIe. max_link is the fastest link the device can use anywhere; claimed_*_mbps are the manufacturer's headline numbers. Community-contributable.",
+  "devices": {
+    "1b1c:1a20": {
+      "name": "Corsair EX400U",
+      "kind": "storage",
+      "max_link": "usb4_40",
+      "claimed_read_mbps": 4000,
+      "claimed_write_mbps": 3600,
+      "usb4_id": "13fe:6900",
+      "notes": "USB4 NVMe SSD. On a 10 Gbps port it enumerates as USB 3.2 Gen 2 storage; on a USB4 / Thunderbolt port it tunnels PCIe and appears as an NVMe disk behind a USB4 router."
+    },
+    "17e9:ff1a": {
+      "name": "Elgato Prompter",
+      "kind": "display",
+      "max_link": "ss5",
+      "notes": "DisplayLink-based USB display. Produces steady bulk traffic while showing content, which shares the dock uplink."
+    }
+  }
+}

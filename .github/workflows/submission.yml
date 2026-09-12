@@ -1,0 +1,58 @@
+# Turns an issue opened with the "Add or update a dock" form into a pull
+# request. The issue body is handed to cmd/submit through a file, never
+# through the shell, so nothing in it can run as a command.
+name: Dock submission
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  submit:
+    if: contains(github.event.issue.labels.*.name, 'dock-submission')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Write the issue body to a file
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: printf '%s' "$ISSUE_BODY" > /tmp/issue-body.md
+      - name: Merge the entry into docks.json
+        id: submit
+        run: go run ./cmd/submit /tmp/issue-body.md 2> /tmp/problems.txt
+        continue-on-error: true
+      - name: Report problems on the issue
+        if: steps.submit.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Thanks! The entry could not be merged automatically:"
+            echo
+            echo '```'
+            cat /tmp/problems.txt
+            echo '```'
+            echo
+            echo "Edit the issue to fix it and the check runs again, or a maintainer will pick it up."
+          } > /tmp/comment.md
+          gh issue comment ${{ github.event.issue.number }} --body-file /tmp/comment.md
+          exit 1
+      - name: Open a pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: submission/issue-${{ github.event.issue.number }}
+          commit-message: "${{ steps.submit.outputs.summary }} (#${{ github.event.issue.number }})"
+          title: "${{ steps.submit.outputs.summary }}"
+          body: |
+            Submitted in #${{ github.event.issue.number }} and merged by the submission workflow.
+
+            Closes #${{ github.event.issue.number }}
+          labels: dock-submission

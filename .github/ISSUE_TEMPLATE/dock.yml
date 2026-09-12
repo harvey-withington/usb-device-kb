@@ -1,0 +1,28 @@
+name: Add or update a dock
+description: Share a dock's hubs, router strings and ports so apps can draw it as one box.
+title: "Dock: "
+labels: [dock-submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste the dock entry below. Port Authority's "Share with the community" button fills this in; by hand, follow the shape in `docks.json`. A workflow validates the entry and opens a pull request. Never include serial numbers.
+  - type: textarea
+    id: entry
+    attributes:
+      label: Dock entry (JSON)
+      render: json
+      placeholder: |
+        {
+          "name": "CalDigit TS4",
+          "hubs": ["2188:5802", "2188:5500"],
+          "usb4": { "vendor": "CalDigit, Inc.", "model": "TS4" },
+          "uplink": { "kind": "thunderbolt4", "max_link": "usb4_40" }
+        }
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Where the ids came from, what was checked on the real dock, which ports the printed labels were read from.

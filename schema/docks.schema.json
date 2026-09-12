@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/harvey-withington/usb-device-kb/schema/docks.schema.json",
+  "title": "usb-device-kb docks",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["docks"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "generic_internal_hubs": {
+      "description": "Chipset hubs found inside many docks, vid:pid -> description. Never listed under a dock's hubs.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/pair" },
+      "additionalProperties": { "type": "string" }
+    },
+    "docks": { "type": "array", "items": { "$ref": "#/$defs/dock" } }
+  },
+  "$defs": {
+    "pair": { "type": "string", "pattern": "^[0-9a-f]{4}:[0-9a-f]{4}$", "description": "Lower-case hex USB vid:pid" },
+    "linkSpeed": { "type": "string", "enum": ["unknown", "none", "low", "full", "high", "ss5", "ss10", "ss20", "usb4_20", "usb4_40", "usb4_80"] },
+    "connector": { "type": "string", "enum": ["usb-c", "usb-a", "internal", "unknown"] },
+    "dock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "hubs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "description": "Stable slug, vendor-model" },
+        "name": { "type": "string", "minLength": 1 },
+        "hubs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/pair" }, "description": "Every logical hub the dock exposes" },
+        "uplink": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "max_link"],
+          "properties": { "kind": { "type": "string", "minLength": 1 }, "max_link": { "$ref": "#/$defs/linkSpeed" } }
+        },
+        "usb4": {
+          "description": "The vendor and model strings the dock's own USB4 router announces from its DROM",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["vendor", "model"],
+          "properties": { "vendor": { "type": "string", "minLength": 1 }, "model": { "type": "string", "minLength": 1 }, "notes": { "type": "string" } }
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "position", "connector", "max_link", "count"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1 },
+              "position": { "type": "string" },
+              "connector": { "$ref": "#/$defs/connector" },
+              "max_link": { "$ref": "#/$defs/linkSpeed" },
+              "count": { "type": "integer", "minimum": 1 },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "port_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["hub", "port", "label", "position", "verified"],
+            "properties": {
+              "hub": { "$ref": "#/$defs/pair" },
+              "port": { "type": "integer", "minimum": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "position": { "type": "string" },
+              "verified": { "type": "string", "minLength": 1, "description": "When and on what hardware the mapping was checked" }
+            }
+          }
+        },
+        "verified": { "type": "string", "description": "\"hardware\" when checked on a real dock, otherwise the source" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
